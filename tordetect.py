@@ -39,13 +39,19 @@ def proccess_packet(consensus, fingerprints, pkt):
         print_alert('guard', pkt[IP].src)
     if toriginator.from_exit(consensus, pkt):
         print_alert('exit', pkt[IP].dst)
-    if toriginator.tor_fingerprint(fingerprints, pkt):
-        print_alert('fp', pkt[IP].src)
+    if fingerprints is not None:
+        if toriginator.tor_fingerprint(fingerprints, pkt):
+            print_alert('fp', pkt[IP].src)
 
 def main():
     args = parse_args()
-    fingerprints = set(open(args.fingerprints).readlines())
     consensus = toriginator.Consensus(args.consensus)
+
+    try:
+        fingerprints = set(open(args.fingerprints).readlines())
+        fingerprints = map(lambda x: x.rstrip(), fingerprints)
+    except:
+        fingerprints = None
 
     if args.pcap != None:
         try:

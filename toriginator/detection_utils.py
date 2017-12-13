@@ -19,9 +19,7 @@ def from_exit(consensus, pkt):
 
 def tor_fingerprint(fingerprints, pkt):
     f = get_ja3_hash(pkt)
-    print(fingerprints)
     if f in fingerprints:
-        print(f)
         return True
     else:
         return False
