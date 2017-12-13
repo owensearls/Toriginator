@@ -13,15 +13,38 @@ def parse_args():
                         help="A PCAP file to read", default=None)
     parser.add_argument('-c', action="store", dest="consensus",
                         help="A Tor consensus file", default=None)
+    parser.add_argument('-f', action="store", dest="fingerprints",
+                        help="A list of JA3 fingerprints",
+                        default='test/torfingerprint.txt')
     return parser.parse_args()
 
-def proccess_packet(pkt):
+issued = set()
+def print_alert(type, ip):
+    global issued
+
+    alerts = {'guard': 'Detected traffic to Tor router from {ip}.',
+              'exit': 'Detected traffic from Tor exit node with IP {ip}.',
+              'fp': 'Detected traffic matching Tor fingerprint from {ip}.'}
+
+    alert = alerts.get(type)
+    if alert is None:
+        return
+
+    if alert not in issued:
+        issued.add(alert)
+        print(alert.format(ip=ip))
+
+def proccess_packet(consensus, fingerprints, pkt):
     if toriginator.to_guard(consensus, pkt):
-        print('detected originating traffic to Tor')
+        print_alert('guard', pkt[IP].src)
+    if toriginator.from_exit(consensus, pkt):
+        print_alert('exit', pkt[IP].dst)
+    if toriginator.tor_fingerprint(fingerprints, pkt):
+        print_alert('fp', pkt[IP].src)
 
 def main():
     args = parse_args()
-    global consensus
+    fingerprints = set(open(args.fingerprints).readlines())
     consensus = toriginator.Consensus(args.consensus)
 
     if args.pcap != None:
@@ -32,11 +55,14 @@ def main():
             sys.exit(1)
 
         for pkt in packets:
-            proccess_packet(pkt)
+            proccess_packet(consensus, fingerprints, pkt)
 
     else:
         try:
-            packets = sniff(iface=args.interface, prn=proccess_packet)
+            packets = sniff(iface=args.interface,
+                            prn=lambda p: proccess_packet(consensus,
+                                                          fingerprints,
+                                                          p))
         except:
             print('tordetect.py: error: failed to initialize sniffing on '
                   + args.interface)
