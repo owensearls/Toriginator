@@ -30,14 +30,14 @@ class Toriginator:
 
         return routers
 
-    def is_originating(pkt):
+    def is_originating(self, pkt):
         if 'Guard' in self.routers[pkt[IP].dest].flags:
             return True
         else:
             # Protocol analysis!!!
             return False
 
-    def is_exit(pkt):
+    def is_exit(self, pkt):
         if 'Exit' in self.routers[pkt[IP].src].flags:
             return True
         else:
