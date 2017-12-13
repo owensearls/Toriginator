@@ -2,9 +2,8 @@ import urllib
 import tempfile
 
 from stem.descriptor import DocumentHandler, parse_file
-from scapy.all import *
 
-class Toriginator:
+class Consensus:
     directory_authority = 'http://86.59.21.38/'
     descriptor_type = 'network-status-consensus-3 1.0'
 
@@ -30,18 +29,3 @@ class Toriginator:
             routers[router.address] = router
 
         return routers
-
-    def is_originating(self, pkt):
-        router = self.routers.get(pkt[IP].dst)
-        if router is not None:
-            if 'Guard' in router.flags:
-                return True
-        else:
-            # Protocol analysis!!!
-            return False
-
-    def is_exit(self, pkt):
-        if 'Exit' in self.routers[pkt[IP].src].flags:
-            return True
-        else:
-            return False

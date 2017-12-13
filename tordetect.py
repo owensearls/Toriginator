@@ -16,13 +16,13 @@ def parse_args():
     return parser.parse_args()
 
 def proccess_packet(pkt):
-    if t.is_originating(pkt):
+    if toriginator.to_guard(consensus, pkt):
         print('detected originating traffic to Tor')
 
 def main():
     args = parse_args()
-    global t
-    t = toriginator.Toriginator(args.consensus)
+    global consensus
+    consensus = toriginator.Consensus(args.consensus)
 
     if args.pcap != None:
         try:
