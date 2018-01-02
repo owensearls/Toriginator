@@ -1,7 +1,8 @@
 # Toriginator
 A library and command line program to detect and analyze originating traffic to
 Tor. This project was undertaken to support the final essay "Identifying
-Originating Traffic to Anonymity Networks" for COMP116 at Tufts University.
+Originating Traffic to Anonymity Networks" for COMP116 at Tufts University,
+which can be read at http://www.cs.tufts.edu/comp/116/archive/fall2017/osearls.pdf.
 
 ## tordetect
 This program analyzes internet traffic from either a network interface or
